@@ -1,0 +1,171 @@
+.data SIZE 7
+.data array 5,6,8,2,2,1,7
+.data tmpA 0,0,0,0,0,0,0
+.data tmpB 0,0,0,0,0,0,0
+ 
+MERGE:
+    ; [SP+1]=r, [SP+2]=m, [SP+3]=l
+    MOV MA SP
+    ADD MA $2
+    ;MA->m
+    MOV C [SP]
+    SUB MA $1
+    ;MA->r
+    MOV D [MA]
+    SUB D C
+    ADD MA $2
+    ;MA->l
+    MOV A [MA]
+    SUB C A
+    ADD C $1
+    MOV MA array
+    ADD MA A
+    MOV MB tmpA
+    MOV A $0
+    MOV B $0
+    ; [MA] = [array+l], [MB]=[tmpB], A = 0, B = 0, C=n1, D=n2
+    LOOP1:
+        MOV [MB] [MA]
+        ADD MB $1
+        ADD MA $1
+        ADD A $1
+        CMP A C
+        JL LOOP1
+    ; [MA] = [array+m+1], [MB]=[tmpA+n1], A = n1, B = 0, C=n1, D=n2
+ 
+    MOV MB tmpB
+ 
+    ; [MA] = [array+m+1], [MB]=[tmpB], A = n1, B = 0, C=n1, D=n2
+    LOOP2:
+        MOV [MB] [MA]
+        ADD MB $1
+        ADD MA $1
+        ADD B $1
+        CMP B D
+        JL LOOP2
+    
+    ; [MA] = [array+r], [MB]=[tmpB], A = n1, B = n2, C=n1, D=n2
+ 
+    MOV MA SP
+    ADD MA $3
+    MOV A [MA]
+    PUSH A
+    MOV MA tmpA
+    MOV A $0
+    MOV B $0
+    LOOP3:
+        CMP A C
+        JGE LOOP4
+        CMP B D
+        JGE LOOP4
+ 
+        CMP [MA] [MB]
+        JL IF
+        JGE ELSE
+        IF:
+            MOV MB array
+            ADD MB [SP]
+            MOV [MB] [MA]
+            MOV MB tmpB
+            ADD MB B
+            ADD A $1
+            ADD [SP] $1
+            JMP LOOP3
+ 
+        ELSE:
+            MOV MA array
+            ADD MA [SP]
+            MOV [MA] [MB]
+            MOV MA tmpA
+            ADD MA A
+            ADD B $1
+            ADD [SP] $1
+            JMP LOOP3
+ 
+    ;[MA] = [tmpA+x], [MB] = [tmpB+y], A = x, B = y, C = n1, D = n2, [SP] = x+y 
+    MOV MB array
+    ADD B A
+    SUB [SP] A
+ 
+    ;[MA] = [tmpA+x], [MB] = [array+x+y], A = x, B = x+y, C = n1, D = n2, [SP] = y 
+    LOOP4:
+        CMP A C
+        JGE LOOP5
+        MOV [MB] [MA]
+        ADD MA $1
+        ADD MB $1
+        ADD A $1
+        ADD B $1
+ 
+    ;[MA] = [tmpA+n1], [MB] = [array+n1+y], A = n1, B = n1+y, C = n1, D = n2, [SP] = y 
+    MOV MA tmpB
+    MOV B [SP]
+    ADD tmpB B
+    POP
+    ;[MA] = [tmpB+y], [MB] = [array+n1+y], A = n1, B = y, C = n1, D = n2
+    LOOP5
+        CMP B D
+        JGE OUT
+        MOV [MB] [MA]
+        ADD MA $1
+        ADD MB $1
+        ADD B $1
+ 
+    OUT:
+    RET
+OK:
+    ;[SP+1]=r;[SP+2]=l
+    ;l<r guraenteed
+    MOV MA SP
+    ADD MA $2
+    MOV A [MA]
+    MOV MB MA
+    SUB MB $1
+    ADD A [MB]
+    RSH A $1
+ 
+    ; call MERGESORT for first half
+    PUSH MA
+    PUSH A
+    CALL MERGESORT
+    POP
+    POP
+    ADD A $1
+ 
+    ;call MERGESORT for second half
+    PUSH A
+    PUSH [MB]
+    CALL MERGESORT
+    POP
+    POP
+ 
+    ; call merge
+    SUB A $1
+    PUSH [MA]
+    PUSH A
+    PUSH [MB]
+    CALL MERGE
+    POP
+    POP
+    POP
+    RET
+    
+MERGESORT:
+    ;[SP+2] =  l, [SP+1] = r
+    MOV MA SP
+    ADD MA $1
+    MOV MB SP
+    ADD MB $2
+    ; MA = r, MB = l
+    CMP [MB] [MA]
+    JL OK
+    RET
+    
+ 
+MAIN:
+    PUSH $0
+    PUSH [SIZE]
+    CALL MERGESORT
+    POP
+    POP
+    RET
