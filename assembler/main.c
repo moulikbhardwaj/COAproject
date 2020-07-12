@@ -1,13 +1,17 @@
 #include "asm.h"
 
 int main(){
-    error=0;
-    symbolTableLength=0;
-    file = fopen("../code.bak","r");
+    init();
     pass1();
     if(error!=0){
-        return 1;
+        return error;
     }
-    // pass2();
-    return 0;
+    error=0;
+    out = fopen("binFile", "w+");
+    fseek(file,0,SEEK_SET);
+    lineNo = 0;
+    eof=0;
+    pass2();
+    cleanup();
+    return error;
 }

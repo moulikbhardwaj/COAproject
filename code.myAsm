@@ -3,6 +3,8 @@
 .data tmpA 0,0,0,0,0,0,0
 .data tmpB 0,0,0,0,0,0,0
  
+JMP MAIN
+
 MERGE:
     ; [SP+1]=r, [SP+2]=m, [SP+3]=l
     MOV MA SP
@@ -32,9 +34,9 @@ MERGE:
         CMP A C
         JL LOOP1
     ; [MA] = [array+m+1], [MB]=[tmpA+n1], A = n1, B = 0, C=n1, D=n2
- 
+    
     MOV MB tmpB
- 
+
     ; [MA] = [array+m+1], [MB]=[tmpB], A = n1, B = 0, C=n1, D=n2
     LOOP2:
         MOV [MB] [MA]
@@ -45,7 +47,7 @@ MERGE:
         JL LOOP2
     
     ; [MA] = [array+r], [MB]=[tmpB], A = n1, B = n2, C=n1, D=n2
- 
+    
     MOV MA SP
     ADD MA $3
     MOV A [MA]
@@ -55,10 +57,10 @@ MERGE:
     MOV B $0
     LOOP3:
         CMP A C
-        JGE LOOP4
+        JGE OUT1
         CMP B D
-        JGE LOOP4
- 
+        JGE OUT1
+
         CMP [MA] [MB]
         JL IF
         JGE ELSE
@@ -71,7 +73,7 @@ MERGE:
             ADD A $1
             ADD [SP] $1
             JMP LOOP3
- 
+            
         ELSE:
             MOV MA array
             ADD MA [SP]
@@ -81,37 +83,41 @@ MERGE:
             ADD B $1
             ADD [SP] $1
             JMP LOOP3
- 
+
     ;[MA] = [tmpA+x], [MB] = [tmpB+y], A = x, B = y, C = n1, D = n2, [SP] = x+y 
+    OUT1:
     MOV MB array
     ADD B A
     SUB [SP] A
- 
+
     ;[MA] = [tmpA+x], [MB] = [array+x+y], A = x, B = x+y, C = n1, D = n2, [SP] = y 
     LOOP4:
         CMP A C
-        JGE LOOP5
+        JGE OUT2
         MOV [MB] [MA]
         ADD MA $1
         ADD MB $1
         ADD A $1
         ADD B $1
- 
+        JMP LOOP4
+
     ;[MA] = [tmpA+n1], [MB] = [array+n1+y], A = n1, B = n1+y, C = n1, D = n2, [SP] = y 
+    OUT2:
     MOV MA tmpB
     MOV B [SP]
-    ADD tmpB B
+    ADD tmpB B ;error
     POP
     ;[MA] = [tmpB+y], [MB] = [array+n1+y], A = n1, B = y, C = n1, D = n2
-    LOOP5
+    LOOP5:
         CMP B D
-        JGE OUT
+        JGE OUT3
         MOV [MB] [MA]
         ADD MA $1
         ADD MB $1
         ADD B $1
- 
-    OUT:
+        JMP LOOP5
+
+    OUT3:
     RET
 OK:
     ;[SP+1]=r;[SP+2]=l
@@ -123,7 +129,7 @@ OK:
     SUB MB $1
     ADD A [MB]
     RSH A $1
- 
+
     ; call MERGESORT for first half
     PUSH MA
     PUSH A
@@ -131,14 +137,14 @@ OK:
     POP
     POP
     ADD A $1
- 
+
     ;call MERGESORT for second half
     PUSH A
     PUSH [MB]
     CALL MERGESORT
     POP
     POP
- 
+
     ; call merge
     SUB A $1
     PUSH [MA]
@@ -161,11 +167,11 @@ MERGESORT:
     JL OK
     RET
     
- 
+
 MAIN:
     PUSH $0
-    PUSH [SIZE]
+    MOV MA SIZE
+    PUSH [MA]
     CALL MERGESORT
     POP
-    POP
-    RET
+    POP 

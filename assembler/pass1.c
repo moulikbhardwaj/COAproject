@@ -1,12 +1,5 @@
 #include "asm.h"
 
-int eof=0;
-
-struct opCodeList opcodes[] = {
-    {"MOV",2,NotNull,NotNull}, {"ADD",2,NotNull,NotNull}, {"SUB",2,NotNull,NotNull}, {"CMP",2,NotNull,NotNull}, {"RSH",2,NotNull,NotNull}, {"CMPL",1,NotNull,Null}, {"PUSH",1,NotNull,Null}, {"POP",0,Null,Null},
-    {"CALL",1,NotNull,Null}, {"RET",0,Null,Null}, {"JNE",1,NotNull,Null}, {"JG",1,NotNull,Null}, {"JGE",1,NotNull,Null}, {"JL",1,NotNull,Null}, {"JLE",1,NotNull,Null}, {"JMP",1,NotNull,Null}
-};
-
 char* skipWhiteSpace(char* line){
     while(isspace(*line)){
         line++;
@@ -14,80 +7,11 @@ char* skipWhiteSpace(char* line){
     return line;
 }
 
-int isComment(char *line){
-    if(*line==';'){return 1;}
-    return 0;
-}
-
-int isDirective(char *line){
-    return !strcmp(line,".data");
-}
-
-int isOpcode(char* token){
-    for(int i = 0; i < 16; i++){
-        if(!strcmp(token,opcodes[i].mnemonic)){
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int wordLength(char *line){
-    int nn = strlen(line);
-    for(int i = 0; i < nn; i++){
-        if(isspace(line[i]) || line[i]==',' || line[i]==';'){return i+1;}
-    }
-    return nn;
-}
-
-int isRegister(char* token){
-    for(int i = 0; i < 7; i++){
-        if(!strcmp(registerSymbols[i],token)){return 1;}
-    }
-    return 0;
-}
-
-int isLabel(char* token){
-    if(*token=='$'){return 0;}
-    if(isOpcode(token)){return 0;}
-    if(isRegister(token)){return 0;}
-    for(int i = 0; i < symbolTableLength; i++){
-        if(!strcmp(token,symbolTable[i].literal)){
-            if(symbolTable[i].LC==-1){
-                return 2;
-            }
-            return 3;
-        }
-    }
-    return 1;
-}
-
-int isNumber(char* token){
-    char *nptr;
-    ret = strtol(token,&nptr,10);
-    return !(token+strlen(token)==nptr);
-}
-
-void getToken(char *line, char* token){
-    int nn = wordLength(line);
-    strncpy(token,line,nn);
-    token[nn-1]='\0';
-    if(strlen(token)>MAXTOKENLENGTH){
-        error++;
-        snprintf(errorBuffer, 256, "%s", "SyntaxError: Token Length Excedded");
-        writeError();
-    }
-}
-
-char* getLine(){
-    if(fgets(lineBuffer,256,file)==NULL){
-        eof=1;
-    }
-    return lineBuffer;
-}
 
 void addLabelToSymbolTable(char* label, int LC){
     int match = -1;
+    int ln = wordLength(label);
+    label[ln]='\0';
     for(int i = 0; i < symbolTableLength; i++){
         if(!strcmp(label, symbolTable[i].literal)){
             match = i;
@@ -104,12 +28,8 @@ void addLabelToSymbolTable(char* label, int LC){
     }
 }
 
-int hasDirective(char* line){
-    return 0;   
-}
-
 void debug(int lineNo){
-    if(lineNo == 7){
+    if(lineNo == 171){
         fprintf(stderr,"debug");
     }
 }
@@ -202,10 +122,10 @@ void pass1(){
             snprintf(errorBuffer, 256, "%s", "Error: Expected an opcode");
             writeError();
         }
-        struct opCodeList op;
+        struct s_OpCodeList op;
         for(int i = 0; i < 16; i++){
-            if(!strcmp(token,opcodes[i].mnemonic)){
-                op = opcodes[i];
+            if(!strcmp(token,mneopcodes[i].mnemonic)){
+                op = mneopcodes[i];
                 break;
             }
         }
@@ -316,9 +236,15 @@ void pass1(){
         }
         continue;
     }
+    for(int i = 0; i < symbolTableLength; i++){
+        if(symbolTable[i].LC==-1){
+            error++;
+            snprintf(errorBuffer, 256, "Error: Cant find symbol %s", symbolTable[i].literal);
+        }
+    }
 }
 
-#ifdef _DEBUG
+#ifdef _PASS1_DEBUG
 int main(){
     init();
     pass1();
