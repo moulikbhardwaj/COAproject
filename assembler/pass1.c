@@ -29,7 +29,7 @@ void addLabelToSymbolTable(char* label, int LC){
 }
 
 void debug(int lineNo){
-    if(lineNo == 171){
+    if(lineNo == 217){
         fprintf(stderr,"debug");
     }
 }

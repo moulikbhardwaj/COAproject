@@ -54,9 +54,9 @@ void init(){
     addOpcode(5,"CMPL", 0b0101,1);
     addOpcode(6,"PUSH", 0b0110,1);
     addOpcode(7,"POP" , 0b0111,0);
-    addOpcode(8,"CALL", 0b1000,1);
-    addOpcode(9,"RET" , 0b1001,0);
-    addOpcode(10,"JNE", 0b1010,1);
+    addOpcode(8,"MCP" , 0b1000,2);
+    addOpcode(9,"CALL", 0b1001,1);
+    addOpcode(10,"RET", 0b1010,0);
     addOpcode(11,"JG" , 0b1011,1);
     addOpcode(12,"JGE", 0b1100,1);
     addOpcode(13,"JL" , 0b1101,1);

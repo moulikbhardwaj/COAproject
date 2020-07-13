@@ -1,16 +1,20 @@
+MOV A $0
+MOV B $0
+MOV C $0
+;;this is done so that token 1 through 9 are free, 
+JMP MAIN
 .data SIZE 7
-.data array 5,6,8,2,2,1,7
+.data array 8,6,5,2,2,1,7
 .data tmpA 0,0,0,0,0,0,0
 .data tmpB 0,0,0,0,0,0,0
  
-JMP MAIN
 
 MERGE:
     ; [SP+1]=r, [SP+2]=m, [SP+3]=l
-    MOV MA SP
+    MCP MA SP
     ADD MA $2
     ;MA->m
-    MOV C [SP]
+    MOV C [MA]
     SUB MA $1
     ;MA->r
     MOV D [MA]
@@ -20,109 +24,147 @@ MERGE:
     MOV A [MA]
     SUB C A
     ADD C $1
-    MOV MA array
+    MCP MA array
     ADD MA A
-    MOV MB tmpA
+    MCP MB tmpA
     MOV A $0
     MOV B $0
     ; [MA] = [array+l], [MB]=[tmpB], A = 0, B = 0, C=n1, D=n2
     LOOP1:
+        PUSH A
+        CMP A C
+        JGE OUT1
+        MOV A SP
+        POP
         MOV [MB] [MA]
         ADD MB $1
         ADD MA $1
         ADD A $1
-        CMP A C
-        JL LOOP1
+        JMP LOOP1
     ; [MA] = [array+m+1], [MB]=[tmpA+n1], A = n1, B = 0, C=n1, D=n2
-    
-    MOV MB tmpB
+    OUT1:
+    MOV A SP
+    POP
+    MCP MB tmpB
 
     ; [MA] = [array+m+1], [MB]=[tmpB], A = n1, B = 0, C=n1, D=n2
     LOOP2:
+        PUSH A
+        CMP B D
+        JGE OUT2
+        MOV A SP
+        POP
         MOV [MB] [MA]
         ADD MB $1
         ADD MA $1
         ADD B $1
-        CMP B D
-        JL LOOP2
+        JMP LOOP2
     
-    ; [MA] = [array+r], [MB]=[tmpB], A = n1, B = n2, C=n1, D=n2
-    
-    MOV MA SP
+    ; [MA] = [array+r], [MB]=[tmpB+n2], A = n1, B = n2, C=n1, D=n2
+    OUT2:
+    MOV A SP
+    POP
+    MCP MA SP
     ADD MA $3
     MOV A [MA]
     PUSH A
-    MOV MA tmpA
+    MCP MA tmpA
+    MCP MB tmpB
     MOV A $0
     MOV B $0
     LOOP3:
+        PUSH A
         CMP A C
-        JGE OUT1
+        JGE OUT3
         CMP B D
-        JGE OUT1
+        JGE OUT3
 
         CMP [MA] [MB]
         JL IF
         JGE ELSE
         IF:
-            MOV MB array
-            ADD MB [SP]
+            MOV A SP
+            POP
+            MCP MB array
+            ADD MB SP
             MOV [MB] [MA]
-            MOV MB tmpB
+            MOV [MA] $0
+            MCP MB tmpB
             ADD MB B
             ADD A $1
-            ADD [SP] $1
+            ADD MA $1
+            ADD SP $1
             JMP LOOP3
             
         ELSE:
-            MOV MA array
-            ADD MA [SP]
+            MOV A SP
+            POP
+            MCP MA array
+            ADD MA SP
             MOV [MA] [MB]
-            MOV MA tmpA
+            MOV [MB] $0
+            MCP MA tmpA
             ADD MA A
             ADD B $1
-            ADD [SP] $1
+            ADD MB $1
+            ADD SP $1
             JMP LOOP3
 
     ;[MA] = [tmpA+x], [MB] = [tmpB+y], A = x, B = y, C = n1, D = n2, [SP] = x+y 
-    OUT1:
-    MOV MB array
-    ADD B A
-    SUB [SP] A
+    OUT3:
+    MOV A SP
+    POP
 
     ;[MA] = [tmpA+x], [MB] = [array+x+y], A = x, B = x+y, C = n1, D = n2, [SP] = y 
     LOOP4:
+        PUSH A
         CMP A C
-        JGE OUT2
+        JGE OUT4
+        MOV A SP
+        POP
+        MCP MB array
+        ADD MB SP
         MOV [MB] [MA]
+        MOV [MA] $0
+        MCP MB tmpB
+        ADD MB B
         ADD MA $1
-        ADD MB $1
         ADD A $1
-        ADD B $1
+        ADD SP $1
         JMP LOOP4
 
     ;[MA] = [tmpA+n1], [MB] = [array+n1+y], A = n1, B = n1+y, C = n1, D = n2, [SP] = y 
-    OUT2:
-    MOV MA tmpB
-    MOV B [SP]
-    ADD tmpB B ;error
+    OUT4:
+    MOV A SP
     POP
+
     ;[MA] = [tmpB+y], [MB] = [array+n1+y], A = n1, B = y, C = n1, D = n2
     LOOP5:
+        PUSH A
         CMP B D
-        JGE OUT3
-        MOV [MB] [MA]
-        ADD MA $1
+        JGE OUT5
+        MOV A SP
+        POP
+        MCP MA array
+        ADD MA SP
+        MOV [MA] [MB]
+        MOV [MB] $0
+        MCP MA tmpA
+        ADD MA A
         ADD MB $1
         ADD B $1
+        ADD SP $1
         JMP LOOP5
 
-    OUT3:
+    OUT5:
+    MOV A SP
+    POP
+    POP
     RET
 OK:
     ;[SP+1]=r;[SP+2]=l
     ;l<r guraenteed
-    MOV MA SP
+    MCP MA SP
     ADD MA $2
     MOV A [MA]
     MOV MB MA
@@ -131,37 +173,77 @@ OK:
     RSH A $1
 
     ; call MERGESORT for first half
-    PUSH MA
+    PUSH B
+    PUSH C
+    PUSH D
+    PUSH [MB]
+    PUSH [MA]
     PUSH A
     CALL MERGESORT
+    MOV A SP
     POP
+    MOV MA SP
+    POP
+    MOV MB SP
+    POP
+    MOV D SP
+    POP
+    MOV C SP
+    POP
+    MOV B SP
     POP
     ADD A $1
 
     ;call MERGESORT for second half
+    PUSH B
+    PUSH C
+    PUSH D
+    PUSH MA
     PUSH A
-    PUSH [MB]
+    PUSH MB
     CALL MERGESORT
+    MOV MB SP
     POP
+    MOV A SP
+    POP
+    MOV MA SP
+    POP
+    MOV D SP
+    POP
+    MOV C SP
+    POP
+    MOV B SP
     POP
 
     ; call merge
     SUB A $1
-    PUSH [MA]
+    PUSH D
+    PUSH C
+    PUSH B
+    PUSH MA
     PUSH A
-    PUSH [MB]
+    PUSH MB
     CALL MERGE
+    MOV MB SP
     POP
+    MOV A SP
     POP
+    MOV MA SP
+    POP
+    MOV B SP
+    POP
+    MOV C SP
+    POP
+    MOV D SP
     POP
     RET
     
 MERGESORT:
     ;[SP+2] =  l, [SP+1] = r
-    MOV MA SP
+    MCP MA SP
     ADD MA $1
-    MOV MB SP
-    ADD MB $2
+    MOV MB MA
+    ADD MB $1
     ; MA = r, MB = l
     CMP [MB] [MA]
     JL OK
@@ -170,8 +252,11 @@ MERGESORT:
 
 MAIN:
     PUSH $0
-    MOV MA SIZE
-    PUSH [MA]
+    MCP MA SIZE
+    MOV MA [MA]
+    SUB MA $1
+    PUSH MA
     CALL MERGESORT
     POP
+    MOV MA SP
     POP 

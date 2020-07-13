@@ -7,7 +7,7 @@ void write(__uint8_t dt){
 }
 
 void debugp2(){
-    if(lineNo==128){
+    if(lineNo==217){
         fprintf(stderr,"DEbug");
     }
 }
@@ -16,7 +16,7 @@ void pass2(){
     while(!eof){
         char* line = getLine();
         lineNo++;
-        debugp2();
+        // debugp2();
         char token[MAXTOKENLENGTH+1];
         line = skipWhiteSpace(line);
         if((strlen(line)==0) || (*line==';')){continue;}
@@ -34,7 +34,8 @@ void pass2(){
                 write(dt);
                 line+=strlen(token);
                 line = skipWhiteSpace(line);
-                line++;
+                if(*line==',')
+                    line++;
             }
             continue;
         }
@@ -121,7 +122,7 @@ void pass2(){
                 }
                 else{
                     if(isRegister(token)){
-                        dt|=0b00000000;
+                        dt|=0b00001100;
                         if(!strcmp(token,"SP")){
                             p0=0b0000000;
                         }
@@ -134,11 +135,11 @@ void pass2(){
                     }
                     else{
                         int addr = getAddr(token);
-                        if(opCodes[idx].opcode>=0b1010 && addr>=512){
+                        if(opCodes[idx].opcode>=0b1001 && addr>=512){
                             dt|=0b00000010;
                             addr-=512;
                         }
-                        if(opCodes[idx].opcode>=0b1010 && addr>=256){
+                        if(opCodes[idx].opcode>=0b1001 && addr>=256){
                             dt|=0b00000001;
                             addr-=256;
                         }
@@ -191,31 +192,32 @@ void pass2(){
                         snprintf(errorBuffer,256,"%s", "Error: Expected a register");
                         writeError();
                         continue;
-                        if(!strcmp("SP",token)){
-                            p1 = 0b00000000;
-                        }
-                        else if(!strcmp("MA",token)){
-                            p1 = 0b00000101;
-                        }
-                        else if(!strcmp("MB",token)){
-                            p1 = 0b00000110;
-                        }
-                        else if(!strcmp("A",token)){
-                            p1 = 0b00000001;
-                        }
-                        else if(!strcmp("B",token)){
-                            p1 = 0b00000010;
-                        }
-                        else if(!strcmp("C",token)){
-                            p1 = 0b00000011;
-                        }
-                        else if(!strcmp("D",token)){
-                            p1 = 0b00000100;
-                        }
+                    }
+                    if(!strcmp("SP",token)){
+                        p1 = 0b00000000;
+                    }
+                    else if(!strcmp("MA",token)){
+                        p1 = 0b00000101;
+                    }
+                    else if(!strcmp("MB",token)){
+                        p1 = 0b00000110;
+                    }
+                    else if(!strcmp("A",token)){
+                        p1 = 0b00000001;
+                    }
+                    else if(!strcmp("B",token)){
+                        p1 = 0b00000010;
+                    }
+                    else if(!strcmp("C",token)){
+                        p1 = 0b00000011;
+                    }
+                    else if(!strcmp("D",token)){
+                        p1 = 0b00000100;
                     }
                 }
                 else{
                     if(isRegister(token)){
+                        dt |= 0b00000011;
                         if(!strcmp("SP",token)){
                             p1 = 0b00000000;
                         }
