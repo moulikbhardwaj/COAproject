@@ -6,7 +6,6 @@ void writeError(){
 
 void addOpcode(int idx, char *function, __uint8_t opcode, int paramNum){
     snprintf(opCodes[idx].function, MAXTOKENLENGTH, "%s", function);
-    int ans = 0;
     opCodes[idx].opcode = opcode;
     opCodes[idx].paramNum=paramNum;
     snprintf(mneopcodes[idx].mnemonic,MAXTOKENLENGTH,"%s",function);

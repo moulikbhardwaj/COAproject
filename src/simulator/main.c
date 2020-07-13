@@ -36,7 +36,7 @@ int main(int argc, char** argv){
         binFile = fopen("binFile","r");
     }
     fseek(binFile,0,SEEK_END);
-    size_t fsize = ftell(binFile);
+    int fsize = (int)ftell(binFile);
     fseek(binFile,0,SEEK_SET);
     for(int i = 0; i < fsize; i++){
         __uint8_t ch = getc(binFile);
@@ -72,5 +72,6 @@ int main(int argc, char** argv){
         char dt = memory[i];
         fprintf(ramdump,"%c",dt);
     }
+    cleanup();
     return 0;
 }

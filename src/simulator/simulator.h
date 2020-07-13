@@ -41,7 +41,7 @@ int LC;
 
 int *accessMemroy(int location);
 
-__uint8_t readbits(__uint8_t *);
+void readbits(__uint8_t *);
 
 void decodeOpcode();
 

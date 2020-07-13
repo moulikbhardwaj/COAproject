@@ -5,7 +5,7 @@ int *accessMemroy(int location){
     return &memory[location];
 }
 
-__uint8_t readbits(__uint8_t *field){
+void readbits(__uint8_t *field){
     *field = memory[LC];
 }
 
@@ -351,8 +351,8 @@ void JMP(){
 void MOV(){
     int *memoryCell0 = (int *)malloc(sizeof(int));
     int *memoryCell1 = (int *)malloc(sizeof(int));
-    int *delter0 = memoryCell0;
-    int *delter1 = memoryCell1;
+    int *deleter0 = memoryCell0;
+    int *deleter1 = memoryCell1;
 
     if(p0==p_Register){
         memoryCell0 = resolveRegister(*param0);
@@ -403,11 +403,13 @@ void MOV(){
     }
 
     *memoryCell0 = *memoryCell1;
+    free(deleter0);
+    free(deleter1);
 }
 
 void MCP(){
     int *memoryCell0 = (int *)malloc(sizeof(int));
-    int *delter0 = memoryCell0;
+    int *deleter0 = memoryCell0;
     if(!(p0==p_Register || p0==p_Memory)){
         fprintf(stderr, "Error: lval expected to be register at token %d\n", LC-2);
         exit(1);
@@ -430,14 +432,14 @@ void MCP(){
         *memoryCell0 = *param1;
     }
 
-    free(delter0);
+    free(deleter0);
 }
 
 void ADD(){
     int *memoryCell0 = (int *)malloc(sizeof(int));
     int *memoryCell1 = (int *)malloc(sizeof(int));
-    int *delter0 = memoryCell0;
-    int *delter1 = memoryCell1;
+    int *deleter0 = memoryCell0;
+    int *deleter1 = memoryCell1;
 
     if(p0==p_Register){
         memoryCell0 = resolveRegister(*param0);
@@ -488,13 +490,15 @@ void ADD(){
     }
 
     *memoryCell0 += *memoryCell1;
+    free(deleter0);
+    free(deleter1);
 }
 
 void SUB(){
     int *memoryCell0 = (int *)malloc(sizeof(int));
     int *memoryCell1 = (int *)malloc(sizeof(int));
-    int *delter0 = memoryCell0;
-    int *delter1 = memoryCell1;
+    int *deleter0 = memoryCell0;
+    int *deleter1 = memoryCell1;
 
     if(p0==p_Register){
         memoryCell0 = resolveRegister(*param0);
@@ -545,13 +549,15 @@ void SUB(){
     }
 
     *memoryCell0 -= *memoryCell1;
+    free(deleter0);
+    free(deleter1);
 }
 
 void CMP(){
     int *memoryCell0 = (int *)malloc(sizeof(int));
     int *memoryCell1 = (int *)malloc(sizeof(int));
-    int *delter0 = memoryCell0;
-    int *delter1 = memoryCell1;
+    int *deleter0 = memoryCell0;
+    int *deleter1 = memoryCell1;
 
     if(p0==p_Register){
         memoryCell0 = resolveRegister(*param0);
@@ -602,13 +608,15 @@ void CMP(){
     }
 
     *registerA = (*memoryCell0 - *memoryCell1);
+    free(deleter0);
+    free(deleter1);
 }
 
 void RSH(){
     int *memoryCell0 = (int *)malloc(sizeof(int));
     int *memoryCell1 = (int *)malloc(sizeof(int));
-    int *delter0 = memoryCell0;
-    int *delter1 = memoryCell1;
+    int *deleter0 = memoryCell0;
+    int *deleter1 = memoryCell1;
 
     if(p0==p_Register){
         memoryCell0 = resolveRegister(*param0);
@@ -659,4 +667,6 @@ void RSH(){
     }
 
     *memoryCell0 >>= *memoryCell1;
+    free(deleter0);
+    free(deleter1);
 }
