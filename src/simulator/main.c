@@ -28,13 +28,14 @@ void cleanup(){
 
 int main(int argc, char** argv){
     init();
-    if(argc!=4){
-        printf("Error: Expected InputFile, OutputFile, symbolTableFile");
+    if(argc!=5){
+        printf("Error: Expected InputFile, OutputFile, symbolTableFile, and ramDumpFile");
         return 1;
     }
     binFile = fopen(argv[1],"r");
     OPfile = fopen(argv[2],"w+");
     Symbol = fopen(argv[3],"r");
+    FILE* ramDump = fopen(argv[4],"w+");
     char buffer[21];
     int addr;
     symbolTableLength=0;
@@ -51,7 +52,6 @@ int main(int argc, char** argv){
         __uint8_t ch = getc(binFile);
         memory[i] = ch;
     }
-    fclose(binFile);
     SP=&memory[1023];
     while(LC < fsize){
         nm++;
@@ -74,6 +74,9 @@ int main(int argc, char** argv){
         // execution cycle
         executeOpcode();
         writeDT();
+    }
+    for(int i = 0; i < 1024; i++){
+        fprintf(ramDump,"%c", memory[i]&0b11111111);
     }
     cleanup();
     return 0;

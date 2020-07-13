@@ -19,6 +19,6 @@ int main(int argc, char** argv){
             buffer[7-i]=(dt%2)+'0';
             dt/=2;
         }
-        printf("token:%d\t\t%s\t\t%d\n",i,buffer,tmp);
+        printf("token:%4d%20s%-20s%d\n",i,buffer, " ",tmp);
     }
 }

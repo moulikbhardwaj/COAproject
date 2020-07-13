@@ -59,9 +59,14 @@ clean:
 	rm -f $(DIR_DATA)/binFile
 	rm -f $(DIR_DATA)/opFile
 	rm -f $(DIR_DATA)/symbolTable.txt
+	rm -f $(DIR_DATA)/ramDump
+	rm -f $(DIR_DATA)/ramDump.parsed
 
 Assemble: $(ASSEMBLER)
 	./$(ASSEMBLER) $(DIR_DATA)/code.myAsm $(DIR_DATA)/binFile $(DIR_DATA)/symbolTable.txt
 
 Simulate: Assemble $(SIMULATOR)
-	./${SIMULATOR} $(DIR_DATA)/binFile $(DIR_DATA)/opFile $(DIR_DATA)/symbolTable.txt
+	./${SIMULATOR} $(DIR_DATA)/binFile $(DIR_DATA)/opFile $(DIR_DATA)/symbolTable.txt $(DIR_DATA)/ramDump
+
+RamDump: Simulate $(EXTRAS_OBJECTS)
+	$(DIR_BIN)/opener.out $(DIR_DATA)/ramDump > $(DIR_DATA)/ramDump.parsed

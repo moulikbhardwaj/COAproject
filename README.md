@@ -4,6 +4,21 @@ This project implements a custom made architecture, with 8 bit fixed length inst
 
 With the help of this project, we are showing how divide and conquor algorithms work, by implementing `MergeSort` algorithm in assembly language, and then executing it on a simulator.
 
+## How to use
+The project works on a linux pc(maybe on windows too, if you have make and gcc in your shell).  
+
+To compile binaries, just write `make` in the terminal, and it should compile binaries into the `bin` folder.
+
+The assmebly code for `MergeSort` algorithm is kept in `data` folder.  
+To assemble the code, type `make Assemble` into terminal and hit enter.  
+This will generate symbol table and binFile in `data` folder.  
+
+To simulate the program, enter `make Simulate` in terminal.  
+This will simulate the program, and will generate `opFile` in data folder, which holds the variables after execution of each line, and `ramDump` file, which holds the values of each word of ram after completition of execution.  
+
+To show the parsed version of ram dump of the simulator after execution, enter `make RamDump`.  
+This will make a file ramDump.parsed, which will hold the token(word) number, the binary value corresponding to that memory location and its encoding in base10.
+
 ## Architecture Details
 The architecture that we implemented is an 8-bit fixed length instruction set architecture. It contains 16 Opcodes, with many of them supporting 4 addressing modes each.  
 The architecture has 1024 bytes of 1-byte-word addressable memory.  
@@ -153,3 +168,9 @@ is a valid set of instructions.
 Our assembly understands .data directive, followed by a label, which allocates a memory and assigns the data following the label to that location. This can also be extended by chaining multiple literals by commas, as   
 `.data someLabel 3,2,5 `  
 If the pc during this instruction is at 100 (say), then this instruction will allocate locations 100, 101 and 102 assigns them values 3, 2, and 5 respectively.
+
+## Authors
+Students of National Instutute of Technology, Hamipur, Himachal Pradesh, India
+* **Moulik, Roll No. 185506**
+* **Swayam Kaul, Roll No. 185512**
+* **Rishabh Deknawat, Roll No. 185519**  
