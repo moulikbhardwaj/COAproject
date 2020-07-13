@@ -1,7 +1,6 @@
 #include "simulator.h"
 
 int *accessMemroy(int location){
-    fprintf(stderr, "Accessing Memroy at location %d\n", location);
     return &memory[location];
 }
 
@@ -182,9 +181,6 @@ void myStrcpy(char* dest, char* src){
 }
 
 void executeOpcode(){
-    if(LC>455){
-        printf("pika");
-    }
     if(requiredOperands==0){
         if(!strcmp("POP",function)){
             POP();
@@ -311,41 +307,35 @@ void CALL(){
     SP--;
     *SP = LC;
     LC = *param0+(((*opcode)&0b00000011)<<8);
-    fprintf(stderr, "call to %d\n", (int)(*param0));
 }
 
 
 void JG(){
     if(*registerA>0){
         LC = *param0+(((*opcode)&0b00000011)<<8);
-        fprintf(stderr, "JG to %d\n", (int)((*param0)+(((*opcode)&0b00000011)<<8)));
     }
 }
 
 void JGE(){
     if(*registerA>=0){
         LC = *param0 + (((*opcode) & 0b00000011) << 8);
-        fprintf(stderr, "JGE to %d\n", (int)((*param0)+(((*opcode)&0b00000011)<<8)));
     }
 }
 
 void JL(){
     if(*registerA<0){
         LC = *param0+(((*opcode)&0b00000011)<<8);
-        fprintf(stderr, "JL to %d\n", (int)((*param0)+(((*opcode)&0b00000011)<<8)));
     }
 }
 
 void JLE(){
     if(*registerA<=0){
         LC = *param0+(((*opcode)&0b00000011)<<8);
-        fprintf(stderr, "JLE to %d\n", (int)((*param0)+(((*opcode)&0b00000011)<<8)));
     }
 }
 
 void JMP(){
     LC = *param0+(((*opcode)&0b00000011)<<8);
-    fprintf(stderr, "JMP to %d\n", (int)((*param0)+(((*opcode)&0b00000011)<<8)));
 }
 
 void MOV(){
@@ -669,4 +659,219 @@ void RSH(){
     *memoryCell0 >>= *memoryCell1;
     free(deleter0);
     free(deleter1);
+}
+
+void writeDT(){
+    char token0[25];
+    char token1[25];
+    if(p0==p_Register){
+        switch (*param0){
+        case 0b0000:
+            myStrcpy(token0,"SP");
+            break;
+        case 0b0001:
+            myStrcpy(token0, "A");
+            break;
+        case 0b0010:
+            myStrcpy(token0, "B");
+            break;
+        case 0b0011:
+            myStrcpy(token0, "C");
+            break;
+        case 0b0100:
+            myStrcpy(token0, "D");
+            break;
+        case 0b0101:
+            myStrcpy(token0, "MA");
+            break;
+        case 0b0110:
+            myStrcpy(token0, "MB");
+            break;
+        }
+    }
+    else if(p0==p_Immidiate){
+        snprintf(token0,25,"$%d",*param0);
+    }
+    else if(p0==p_Dereference){
+        if(resolveRegister(*param0)!=NULL){
+            switch(*param0){
+                case 0b0000:
+                    snprintf(token0,25,"[SP]");
+                    break;
+                case 0b0001:
+                    snprintf(token0,25, "[A]");
+                    break;
+                case 0b0010:
+                    snprintf(token0,25, "[B]");
+                    break;
+                case 0b0011:
+                    snprintf(token0,25, "[C]");
+                    break;
+                case 0b0100:
+                    snprintf(token0,25, "[D]");
+                    break;
+                case 0b0101:
+                    snprintf(token0,25, "[MA]");
+                    break;
+                case 0b0110:
+                    snprintf(token0,25, "[MB]");
+                    break;
+            }
+        }
+        else{
+            int ln = 0;
+            for(int i = 0; i < symbolTableLength; i++){
+                if(table[i].addr==*param0){
+                    ln = i;
+                    break;
+                }
+            }
+            snprintf(token0, 25, "[%s]",table[ln].symbol);
+        }
+    }
+    else if(p0==p_Memory){
+        if(resolveRegister(*param0)!=NULL){
+            switch(*param0){
+                case 0b0000:
+                    snprintf(token0,25,"SP");
+                    break;
+                case 0b0001:
+                    snprintf(token0,25, "A");
+                    break;
+                case 0b0010:
+                    snprintf(token0,25, "B");
+                    break;
+                case 0b0011:
+                    snprintf(token0,25, "C");
+                    break;
+                case 0b0100:
+                    snprintf(token0,25, "D");
+                    break;
+                case 0b0101:
+                    snprintf(token0,25, "MA");
+                    break;
+                case 0b0110:
+                    snprintf(token0,25, "MB");
+                    break;
+            }
+        }
+        else{
+            int ln = 0;
+            for(int i = 0; i < symbolTableLength; i++){
+                if(table[i].addr==*param0){
+                    ln = i;
+                    break;
+                }
+            }
+            snprintf(token0, 25, "%s",table[ln].symbol);
+        }
+    }
+    if(p1==p_Register){
+        switch (*param1){
+        case 0b0000:
+            myStrcpy(token1,"SP");
+            break;
+        case 0b0001:
+            myStrcpy(token1, "A");
+            break;
+        case 0b0010:
+            myStrcpy(token1, "B");
+            break;
+        case 0b0011:
+            myStrcpy(token1, "C");
+            break;
+        case 0b0100:
+            myStrcpy(token1, "D");
+            break;
+        case 0b0101:
+            myStrcpy(token1, "MA");
+            break;
+        case 0b0110:
+            myStrcpy(token1, "MB");
+            break;
+        }
+    }
+    else if(p1==p_Immidiate){
+        snprintf(token1,25,"$%d",*param1);
+    }
+    else if(p1==p_Dereference){
+        if(resolveRegister(*param1)!=NULL){
+            switch(*param1){
+                case 0b0000:
+                    snprintf(token1,25,"[SP]");
+                    break;
+                case 0b0001:
+                    snprintf(token1,25, "[A]");
+                    break;
+                case 0b0010:
+                    snprintf(token1,25, "[B]");
+                    break;
+                case 0b0011:
+                    snprintf(token1,25, "[C]");
+                    break;
+                case 0b0100:
+                    snprintf(token1,25, "[D]");
+                    break;
+                case 0b0101:
+                    snprintf(token1,25, "[MA]");
+                    break;
+                case 0b0110:
+                    snprintf(token1,25, "[MB]");
+                    break;
+            }
+        }
+        else{
+            int ln = 0;
+            for(int i = 0; i < symbolTableLength; i++){
+                if(table[i].addr==*param1){
+                    ln = i;
+                    break;
+                }
+            }
+            snprintf(token1, 25, "[%s]",table[ln].symbol);
+        }
+    }
+    else if(p1==p_Memory){
+        if(resolveRegister(*param1)!=NULL){
+            switch(*param1){
+                case 0b0000:
+                    snprintf(token1,25,"SP");
+                    break;
+                case 0b0001:
+                    snprintf(token1,25, "A");
+                    break;
+                case 0b0010:
+                    snprintf(token1,25, "B");
+                    break;
+                case 0b0011:
+                    snprintf(token1,25, "C");
+                    break;
+                case 0b0100:
+                    snprintf(token1,25, "D");
+                    break;
+                case 0b0101:
+                    snprintf(token1,25, "MA");
+                    break;
+                case 0b0110:
+                    snprintf(token1,25, "MB");
+                    break;
+            }
+        }
+        else{
+            int ln = 0;
+            for(int i = 0; i < symbolTableLength; i++){
+                if(table[i].addr==*param1){
+                    ln = i;
+                    break;
+                }
+            }
+            snprintf(token1, 25, "%s",table[ln].symbol);
+        }
+    }
+    int n = memory[11];
+    fprintf(OPfile,"*tokenNo:%d, line:%s %s %s, A:%d, B:%d, C:%d, D:%d, MA:%d, MB:%d, SP:%d, SIZE:%d, ARRAY:{", LC, function, token0, token1, (*registerA)&0b1111111111, (*registerB)&0b1111111111, (*registerC)&0b1111111111, (*registerD)&0b1111111111, (*registerMA)&0b1111111111, (*registerMB)&0b1111111111, *SP&0b1111111111, n);
+    for(int i = 0; i < n; i++){
+        fprintf(OPfile,"%d ", memory[12+i]&0b1111111111);
+    }
+    fprintf(OPfile,"}*\n");
 }

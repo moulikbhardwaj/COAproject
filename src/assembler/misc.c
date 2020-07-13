@@ -36,7 +36,9 @@ char* getLine(){
 void init(){
     error = 0;
     symbolTableLength = 0;
-    file = fopen("../code.myAsm", "r");
+    file = fopen(inputFileName, "r+");
+    out = fopen(outputFileName, "w+");
+    symbolFile = fopen(symbolTableFileName, "w+");
     strcpy(registerSymbols[0],"A");
     strcpy(registerSymbols[1],"B");
     strcpy(registerSymbols[2],"C");
@@ -84,7 +86,6 @@ void getToken(char *line, char* token){
 }
 
 void cleanup(){
-    fclose(file);
     #ifdef _SHOW_SYMBOL_TABLE
         printf("\t\033[0;32mSymbol Table: \033[0m\n");
         printf("\033[0;34m%-20s %s", "Label", "LocationCounter\033[0m\n");
@@ -92,8 +93,12 @@ void cleanup(){
             printf("%-21s%d\n", symbolTable[i].literal, symbolTable[i].LC);
         }
     #endif
+    fclose(file);
+    fclose(out);
+    fclose(symbolFile);
     if(error!=0){
-        system("rm binFile");
+        system(outputFileName);
+        system(symbolTableFileName);
     }
 }
 

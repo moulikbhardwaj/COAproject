@@ -8,7 +8,7 @@ void init(){
     registerD = (int*)malloc(sizeof(int));;
     registerMA = (int*)malloc(sizeof(int));;
     registerMB = (int*)malloc(sizeof(int));;
-    SP = (int*)malloc(sizeof(int));;
+    SP = &memory[1023];
     opcode = (__uint8_t*)malloc(sizeof(__uint8_t));;
     param0 = (__uint8_t*)malloc(sizeof(__uint8_t));;
     param1 = (__uint8_t*)malloc(sizeof(__uint8_t));;
@@ -21,7 +21,6 @@ void cleanup(){
     free(registerD);
     free(registerMA);
     free(registerMB);
-    free(SP);
     free(opcode);
     free(param0);
     free(param1);
@@ -29,11 +28,21 @@ void cleanup(){
 
 int main(int argc, char** argv){
     init();
-    if(argc==2){
-        binFile = fopen(argv[1],"r");
+    if(argc!=4){
+        printf("Error: Expected InputFile, OutputFile, symbolTableFile");
+        return 1;
     }
-    else{
-        binFile = fopen("binFile","r");
+    binFile = fopen(argv[1],"r");
+    OPfile = fopen(argv[2],"w+");
+    Symbol = fopen(argv[3],"r");
+    char buffer[21];
+    int addr;
+    symbolTableLength=0;
+    fscanf(Symbol,"%s %s", buffer, buffer);
+    while(fscanf(Symbol,"%s %d", buffer, &addr)>0){
+        table[symbolTableLength].addr=addr;
+        snprintf(table[symbolTableLength].symbol,21,"%s", buffer);
+        symbolTableLength++;
     }
     fseek(binFile,0,SEEK_END);
     int fsize = (int)ftell(binFile);
@@ -52,7 +61,8 @@ int main(int argc, char** argv){
 
         // Opcode Decode
         decodeOpcode();
-        fprintf(stderr, "function to be executed: %s\n", function);
+
+        // If more operators are required
         if(requiredOperands>=1){
             readbits(param0);
             incrementLC();
@@ -62,15 +72,8 @@ int main(int argc, char** argv){
             incrementLC();
         }
         // execution cycle
-        // if(LC==24){
-        //     printf(" ");
-        // }
         executeOpcode();
-    }
-    FILE *ramdump = fopen("ramdump","w");
-    for(int i = 0; i < fsize; i++){
-        char dt = memory[i];
-        fprintf(ramdump,"%c",dt);
+        writeDT();
     }
     cleanup();
     return 0;

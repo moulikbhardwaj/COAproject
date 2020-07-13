@@ -7,6 +7,7 @@
 /*          ---------------Global Variables--------------                   */
 FILE *file;
 FILE *out;
+FILE *symbolFile;
 int error;
 int ret;
 char errorBuffer[256];
@@ -16,6 +17,9 @@ int lineNo;
 int eof;
 char registerSymbols[7][3];
 __uint8_t p0, p1;
+char inputFileName[256];
+char outputFileName[256];
+char symbolTableFileName[256];
 // struct opcode opCodes[16];
 
 /*          ---------------Structures--------------                   */

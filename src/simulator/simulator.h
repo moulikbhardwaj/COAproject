@@ -16,11 +16,14 @@ int *SP;
 int nm;
 
 FILE *binFile;
+FILE *OPfile;
+FILE *Symbol;
 
-// Flag
-// bit  76543210
-// flag z-c-o
-__uint8_t flag;
+struct symbolTable{
+    char symbol[21];
+    int addr;
+} table[256];
+int symbolTableLength;
 
 // opcode related
 __uint8_t *opcode;
@@ -87,3 +90,5 @@ void JL();
 void JLE();
 
 void JMP();
+
+void writeDT();
