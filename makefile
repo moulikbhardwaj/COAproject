@@ -6,6 +6,8 @@ DIR_OBJ = obj
 DIR_BIN = bin
 DIR_DATA= data
 
+execFolder = emmulatorCOproject/application.
+
 SIMULATOR = $(addprefix $(DIR_BIN)/,simulator.out)
 ASSEMBLER = $(addprefix $(DIR_BIN)/,assembler.out)
 
@@ -69,4 +71,17 @@ Simulate: Assemble $(SIMULATOR)
 	./${SIMULATOR} $(DIR_DATA)/binFile $(DIR_DATA)/opFile $(DIR_DATA)/symbolTable.txt $(DIR_DATA)/ramDump
 
 RamDump: Simulate $(EXTRAS_OBJECTS)
-	$(DIR_BIN)/opener.out $(DIR_DATA)/ramDump > $(DIR_DATA)/ramDump.parsed
+	$(DIR_BIN)/opener.out $(DIR_D
+	
+RunLinux32:
+	$(execFolder)linux32/emmulatorCOproject data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
+
+RunLinux64:
+	$(execFolder)linux64/emmulatorCOproject data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
+
+RunWindows32:
+	$(execFolder)windows32/emmulatorCOproject.exe data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
+
+RunWindows64:
+	$(execFolder)windows64/emmulatorCOproject.exe data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
+

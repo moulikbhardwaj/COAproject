@@ -5,6 +5,9 @@ This project implements a custom made architecture, with 8 bit fixed length inst
 With the help of this project, we are showing how divide and conquor algorithms work, by implementing `MergeSort` algorithm in assembly language, and then executing it on a simulator.
 
 ## How to use
+To run the complete project with GUI, enter make {OS} into your terminal.  
+{OS} here is the os on which you are executing on, eg Linux64 means 64 bit linux, Windows32 means 32 bit windows
+
 The project works on a linux pc(maybe on windows too, if you have make and gcc in your shell).  
 
 To compile binaries, just write `make` in the terminal, and it should compile binaries into the `bin` folder.
