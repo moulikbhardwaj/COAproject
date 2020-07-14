@@ -73,15 +73,15 @@ Simulate: Assemble $(SIMULATOR)
 RamDump: Simulate $(EXTRAS_OBJECTS)
 	$(DIR_BIN)/opener.out $(DIR_D
 	
-RunLinux32:
+RunLinux32: Simulate
 	$(execFolder)linux32/emmulatorCOproject data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
 
-RunLinux64:
+RunLinux64: Simulate
 	$(execFolder)linux64/emmulatorCOproject data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
 
-RunWindows32:
+RunWindows32: Simulate
 	$(execFolder)windows32/emmulatorCOproject.exe data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
 
-RunWindows64:
+RunWindows64: Simulate
 	$(execFolder)windows64/emmulatorCOproject.exe data/opFile assets/arrow.jpeg assets/arrowcopy.jpeg 
 
