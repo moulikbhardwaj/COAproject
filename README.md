@@ -168,7 +168,7 @@ Our asssembly language understands labels and they can be used as a reference fo
 `RET`  
 is a valid set of instructions.
 #### DATAPATH AND CONTROL PATH SCHEMATIC
-![](https://github.com/moulikbhardwaj/COAproject/blob/master/data/output_qPTKuY.gif)
+![](https://github.com/moulikbhardwaj/COAproject/blob/master/data/DATA_PATH.gif)
 
 #### Directives
 Our assembly understands .data directive, followed by a label, which allocates a memory and assigns the data following the label to that location. This can also be extended by chaining multiple literals by commas, as   
